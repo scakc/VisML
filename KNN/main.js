@@ -1,6 +1,6 @@
 function init(nClasses, nSamples, seed){
-    var means = tf.randomNormal([nClasses*2,1], 0, 5,'float32', seed) // 2C x 1
-    var stds = tf.add(tf.randomNormal([nClasses*2,1], 0 , 0.5,'float32', seed), 1) // 2C x 1
+    var means = tf.randomNormal([nClasses*2,1], 0, 4, 'float32', seed) // 2C x 1
+    var stds = tf.add(tf.randomUniform([nClasses*2,1], 0 , 0.5,'float32', seed), 1) // 2C x 1
 
     var k, meanx, meany, stdx, stdy, datax, datay,data1, trace, datas, cmeans, cvals, pdata;
     
@@ -32,12 +32,12 @@ function init(nClasses, nSamples, seed){
         if(i==0){
             datas = data1;
             cmeans = data1.mean(axis=0).reshape([1,2]); // 1 x 2
-            cvals = tf.tensor1d([i]);
+            cvals = tf.mul(tf.ones([data1.shape[0], 1]), i);
             pdata = [trace]
         }else{
             datas = tf.concat([datas,data1], axis = 0); // SC x 2 finally
             cmeans = tf.concat([cmeans, data1.mean(axis= 0).reshape([1,2])], axis = 0); // C x 2
-            cvals = tf.concat([cvals, tf.tensor1d([i])]); // C x 1
+            cvals = tf.concat([cvals, tf.mul(tf.ones([data1.shape[0], 1]), i)], axis = 0); // CS x 1
             pdata = pdata.concat(trace);
         }
 
@@ -60,29 +60,50 @@ function init(nClasses, nSamples, seed){
 
 }
 
-function protoclassify(){
+function knnclassify(){
 
-    var N, k , mx, my, mean, dist, sdist, labels, trace, layout;
+    var N, k , mx, my, mean, dist, sdist, labels, trace, layout, kval;
+
+    kval = parseInt(document.getElementById("kval").value);
 
     N = grid.shape[0];
+    CS = datas.shape[0];
 
-    meandata = cmeans.dataSync();
-    for (var i = 0; i < cvals.shape[0]; i++) {
-        k = 2*i;
-        mx = meandata[k];
-        my = meandata[k+1];
-        mean = tf.tensor1d([mx,my]).reshape([1,-1]);
-        dist = tf.sum(tf.square(tf.sub(grid,mean)), axis = 1).reshape([N,1]);
-        if(i==0){
-            sdist = dist;
+    
+
+    distance = tf.sum(tf.square(tf.sub(datas, grid.expandDims(1))), axis=2)
+
+    // for (var i = 0; i < CS; i++) {
+    //     if(i==0){
+    //         dist = tf.sum(tf.squaredDifference(grid, datas.slice([i,0],[1,2])), axis = 1).reshape([-1,1]);
+    //     }else{
+    //         dist = tf.concat([dist,
+    //             tf.sum(tf.squaredDifference(grid, datas.slice([i,0],[1,2])), axis = 1).reshape([-1,1])], axis = 1);
+    //     }
+    // }
+    // distance = dist;
+    // negdist = tf.mul(dist, [-1]);
+
+    // // dist is N x C matrix
+
+    varsg = tf.topk(tf.neg(distance), kval);
+
+    
+
+    for (var i = 0; i < kval; i++) {
+
+        top_k_label = tf.gather(cvals, tf.slice(varsg.indices, [0,i],[N,1]).reshape([-1]).dataSync()).asType('int32').reshape([-1]);
+        slice = tf.oneHot(top_k_label, nClasses); // N x C
+        // slice = tf.div(tf.slice(ohlabels, [i*N,0],[N,nClasses]).asType('float32'), tf.neg(tf.slice(varsg.values, [0,i],[N,1]))); 
+        if(i == 0){
+            sumvec = slice;
         }else{
-            sdist = tf.concat([sdist, dist], axis = 1);
+            sumvec = tf.add(sumvec, slice);
         }
-
     }
 
-    labelsindx = tf.argMin(sdist, axis = 1);
-    labels = tf.gather(cvals, labelsindx);
+
+    labels = tf.argMax(sumvec, axis = 1);
 
     trace = {
     x: Array.from(grid.slice([0, 0],[N,1]).dataSync()),
@@ -97,25 +118,13 @@ function protoclassify(){
     [0.45, 'rgb(178,223,138)'], [0.65, 'rgb(51,160,44)'], [0.85, 'rgb(251,154,153)'], [1, 'rgb(227,26,28)']]
     };
 
-    meanplot = {
-    x: Array.from(cmeans.slice([0, 0],[nClasses,1]).dataSync()),
-    y: Array.from(cmeans.slice([0, 1],[nClasses,1]).dataSync()),
-    mode : 'markers',
-    type : 'scatter',
-    marker : {
-        size : 10,
-        color : 'rgba(50, 250, 150, .8)',
-        line : {width : 2},
-    },
-    name : 'Means',
-    };
 
     layout = { 
       title: "Visualizing Classification",
       font: {size: 18}
     };
 
-    cData = pdata.concat(trace).concat(meanplot);
+    cData = pdata.concat(trace);
 
     Plotly.newPlot('myDiv', cData, layout, {responsive: true});
 
@@ -129,7 +138,7 @@ document.getElementById("init").onclick = function() {varys = cINIT()
     nClasses = varys[0];
     seed = varys[2];
 };
-document.getElementById("cfy").onclick = function() {protoclassify()};
+document.getElementById("cfy").onclick = function() {knnclassify()};
 
 
 function cINIT(nClasses, nSamples, seed) {
@@ -171,9 +180,9 @@ function cADD() {
     
 }
 var cmap = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf']
-var nClasses = 2;
+var nClasses = 3;
 var nSamples = 50;
-var seed = 590;
+var seed = 5;
 var datas,cmeans,cvals,xmin,xmax,ymin,ymax, grid;
 
 cINIT(nClasses, nSamples,seed);
