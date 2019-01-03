@@ -101,7 +101,7 @@ function knnclassify(){
 
 
     layout = { 
-      title: "Visualizing Classification",
+      title: "Visualizing Regression",
       font: {size: 18}
     };
 
