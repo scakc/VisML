@@ -16,4 +16,5 @@ function grid1dflat(xmin,xmax,nX){
     var xsteps = (xmax - xmin)/nX;
     var xvals = tf.range(xmin,xmax,xsteps).reshape([-1,1]);
     return xvals;
+    //
 }

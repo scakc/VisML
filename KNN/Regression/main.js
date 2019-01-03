@@ -126,7 +126,7 @@ function cINIT(nClasses, nSamples, seed) {
     if(nClasses){
         ;
     }else{
-        nClasses = document.getElementById("nClasses").value;
+        nClasses = 1;
         nSamples = document.getElementById("nSamples").value;
         seed = document.getElementById("seed").value;
 
