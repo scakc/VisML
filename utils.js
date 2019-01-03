@@ -11,3 +11,9 @@ function grid2dflat(xmin,xmax,ymin,ymax, nX,nY){
     var grid = tf.concat([xgrid, ygrid], axis = 1);
     return grid;
 }
+
+function grid1dflat(xmin,xmax,nX){
+    var xsteps = (xmax - xmin)/nX;
+    var xvals = tf.range(xmin,xmax,xsteps).reshape([-1,1]);
+    return xvals;
+}
