@@ -160,6 +160,15 @@ function cINIT(nClasses, nSamples, seed) {
 function cADD() {
     
 }
+
+function grid1dflat(xmin,xmax,nX){
+    var xsteps = (xmax - xmin)/nX;
+    var xvals = tf.range(xmin,xmax,xsteps).reshape([-1,1]);
+    return xvals;
+    //
+}
+
+
 var cmap = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf']
 var nClasses = 1;
 var nSamples = 50;
