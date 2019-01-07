@@ -63,7 +63,6 @@ function process(){
 
     var N, k , mx, my, mean, dist, sdist, labels, trace, layout, kval;
 
-    kval = parseInt(document.getElementById("kval").value);
 
     
     CS = datas.shape[0];
