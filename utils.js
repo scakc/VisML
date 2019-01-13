@@ -1,4 +1,11 @@
 
+function sigmoid(z){
+
+    return tf.div(1 , tf.add(1, tf.exp(tf.neg(z))));
+    
+}
+
+
 function grid2dflat(xmin,xmax,ymin,ymax, nX,nY){
     var xsteps = (xmax - xmin)/nX;
     var ysteps = (ymax - ymin)/nY;
