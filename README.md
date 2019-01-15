@@ -6,4 +6,4 @@ Visualisation of Machine Learning for Learning Purpose. ([Project Link](https://
   3. [K Nearest Neighbour Regression](https://scakc.github.io/VisML/KNN/Regression/index.html)
   4. [Linear Regression](https://scakc.github.io/VisML/Linear/Regression/index.html)
   5. [Ridge Regression](https://scakc.github.io/VisML/Linear/Ridge/index.html)
-  6. [Gaussian Inference](https://scakc.github.io/VisML/Gaussian Bayesian Inference/index.html)
+  6. [Gaussian Inference](https://scakc.github.io/VisML/Gaussian%20Bayesian%20Inference/index.html)
