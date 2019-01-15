@@ -5,6 +5,17 @@ function sigmoid(z){
     
 }
 
+function gaussian(z, mu, sigma){
+
+    var varn = tf.square(sigma);
+    var pi = 3.1415926;
+    var denom = tf.pow(tf.mul(2*pi, varn), 0.5);
+    var expo = tf.mul(tf.div(tf.square(tf.sub(z,mu)),varn), -0.5);
+    var c = tf.div(tf.exp(expo), denom);
+    return c;
+
+}
+
 
 function grid2dflat(xmin,xmax,ymin,ymax, nX,nY){
     var xsteps = (xmax - xmin)/nX;
